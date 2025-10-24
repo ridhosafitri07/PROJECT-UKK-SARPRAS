@@ -6,44 +6,40 @@ use App\Http\Controllers\PengaduanController;
 use App\Http\Controllers\SarprasController;
 use App\Http\Controllers\AdminPengaduanController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Petugas\PetugasController;
 
 /*
 |--------------------------------------------------------------------------
 | Web Routes
 |--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "web" middleware group. Make something great!
-|
 */
+
+// Public routes
+Route::get('/', function () {
+    if (auth()->check()) {
+        return redirect('/dashboard');
+    }
+    return redirect('/login');
+});
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {
-    Route::get('/', [AuthController::class, 'showLogin'])->name('login');
     Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
     Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
     Route::post('/register', [AuthController::class, 'register']);
 });
 
+// Protected routes
 Route::middleware('auth')->group(function () {
     Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
     
+    // Dashboard router
     Route::get('/dashboard', function () {
-        $role = auth()->user()->role;
-        switch ($role) {
-            case 'admin':
-                return redirect()->route('admin.dashboard');
-            case 'petugas':
-                return redirect()->route('petugas.dashboard');
-            case 'pengguna':
-                return redirect()->route('pengguna.dashboard');
-            default:
-                return redirect('/');
-        }
+        return redirect('/' . auth()->user()->role . '/dashboard');
     })->name('dashboard');
 
+    // ===== ADMIN ROUTES =====
     Route::prefix('admin')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':admin'])->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('admin.dashboard');
 
@@ -68,12 +64,27 @@ Route::middleware('auth')->group(function () {
         Route::resource('users', \App\Http\Controllers\Admin\UserController::class, ['as' => 'admin']);
     });
 
+    // ===== PETUGAS ROUTES =====
     Route::prefix('petugas')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':petugas'])->group(function () {
-        Route::get('/dashboard', function () {
-            return view('petugas.dashboard');
-        })->name('petugas.dashboard');
+        // Dashboard
+        Route::get('/dashboard', [PetugasController::class, 'dashboard'])
+            ->name('petugas.dashboard');
+        
+        // Pengaduan Management
+        Route::prefix('pengaduan')->group(function () {
+            Route::get('/', [PetugasController::class, 'pengaduanIndex'])->name('petugas.pengaduan.index');
+            Route::get('/{pengaduan}', [PetugasController::class, 'pengaduanShow'])->name('petugas.pengaduan.show');
+            Route::put('/{pengaduan}/status', [PetugasController::class, 'updateStatus'])->name('petugas.pengaduan.update-status');
+        });
+        
+        // Riwayat
+        Route::prefix('riwayat')->group(function () {
+            Route::get('/', [PetugasController::class, 'riwayatIndex'])->name('petugas.riwayat.index');
+            Route::get('/{pengaduan}', [PetugasController::class, 'riwayatShow'])->name('petugas.riwayat.show');
+        });
     });
 
+    // ===== PENGGUNA ROUTES =====
     Route::prefix('pengguna')->middleware(['auth', \App\Http\Middleware\CheckRole::class . ':pengguna'])->group(function () {
         Route::get('/dashboard', function () {
             $user = auth()->user();
@@ -97,7 +108,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/pengaduan', [PengaduanController::class, 'index'])->name('pengaduan.index');
         Route::get('/pengaduan/create', [PengaduanController::class, 'create'])->name('pengaduan.create');
         Route::post('/pengaduan', [PengaduanController::class, 'store'])->name('pengaduan.store');
-        Route::get('/pengaduan/{pengaduan}', [PengaduanController::class, 'show'])->name('pengaduan.show');
+        Route::get('/pengaduan/{pengaduan}', action: [PengaduanController::class, 'show'])->name('pengaduan.show');
         Route::get('/pengaduan/{pengaduan}/edit', [PengaduanController::class, 'edit'])->name('pengaduan.edit');
         Route::put('/pengaduan/{pengaduan}', [PengaduanController::class, 'update'])->name('pengaduan.update');
         Route::delete('/pengaduan/{pengaduan}', [PengaduanController::class, 'destroy'])->name('pengaduan.destroy');

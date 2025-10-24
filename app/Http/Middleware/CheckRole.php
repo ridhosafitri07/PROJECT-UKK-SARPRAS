@@ -7,6 +7,10 @@ use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Auth;
 
+/**
+ * @property string $role Role required for access
+ */
+
 class CheckRole
 {
     /**
@@ -14,27 +18,16 @@ class CheckRole
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role)
+    public function handle(Request $request, Closure $next, string $role): Response
     {
         if (!Auth::check()) {
-            return redirect('login');
+            return redirect('/login');
         }
 
-        $user = Auth::user();
-        if ($user->role === $role) {
-            return $next($request);
+        if (Auth::user()->role !== $role) {
+            return redirect('/' . Auth::user()->role . '/dashboard');
         }
 
-        // Redirect to appropriate dashboard based on user's role
-        switch ($user->role) {
-            case 'admin':
-                return redirect('/admin/dashboard');
-            case 'petugas':
-                return redirect('/petugas/dashboard');
-            case 'pengguna':
-                return redirect('/pengguna/dashboard');
-            default:
-                return redirect('/')->with('error', 'Unauthorized access.');
-        }
+        return $next($request);
     }
 }

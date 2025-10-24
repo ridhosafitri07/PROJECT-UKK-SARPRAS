@@ -13,11 +13,17 @@ class Petugas extends Model
     protected $fillable = [
         'nama',
         'gender',
-        'telp'
+        'telp',
+        'id_user'
     ];
 
     public function pengaduans()
     {
         return $this->hasMany(Pengaduan::class, 'id_petugas', 'id_petugas');
+    }
+    
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'id_user', 'id_user');
     }
 }

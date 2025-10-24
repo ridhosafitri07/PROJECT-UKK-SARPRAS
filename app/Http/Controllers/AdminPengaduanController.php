@@ -52,7 +52,6 @@ class AdminPengaduanController extends Controller
             
             $pengaduan->save();
 
-            // Update temporary items jika ada
             if ($request->status === 'Disetujui' && $pengaduan->temporary_items->count() > 0) {
                 foreach ($pengaduan->temporary_items as $item) {
                     $item->status_permintaan = 'Disetujui';
@@ -68,7 +67,7 @@ class AdminPengaduanController extends Controller
                 ->with('success', 'Status pengaduan berhasil diperbarui');
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->with('error', 'Terjadi kesalahan saat memperbarui status');
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui status: ' . $e->getMessage());
         }
     }
 }

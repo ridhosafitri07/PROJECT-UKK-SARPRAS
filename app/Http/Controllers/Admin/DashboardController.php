@@ -21,23 +21,19 @@ class DashboardController extends Controller
         $pendingItems = TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count();
 
         // Get monthly pengaduan statistics
-        $pengaduanStats = Pengaduan::select(
-            DB::raw('MONTH(tgl_pengajuan) as month'),
-            DB::raw('COUNT(*) as total')
-        )
-        ->whereYear('tgl_pengajuan', date('Y'))
-        ->groupBy('month')
-        ->orderBy('month')
-        ->get()
-        ->pluck('total', 'month')
-        ->toArray();
+        $pengaduanStats = [];
+        for ($i = 1; $i <= 12; $i++) {
+            $pengaduanStats[$i] = Pengaduan::whereYear('tgl_pengajuan', date('Y'))
+                ->whereMonth('tgl_pengajuan', $i)
+                ->count();
+        }
 
         // Get item status statistics
-        $itemStats = TemporaryItem::select('status_permintaan', DB::raw('COUNT(*) as total'))
-            ->groupBy('status_permintaan')
-            ->get()
-            ->pluck('total', 'status_permintaan')
-            ->toArray();
+        $itemStats = [
+            'Menunggu Persetujuan' => TemporaryItem::where('status_permintaan', 'Menunggu Persetujuan')->count(),
+            'Disetujui' => TemporaryItem::where('status_permintaan', 'Disetujui')->count(),
+            'Ditolak' => TemporaryItem::where('status_permintaan', 'Ditolak')->count(),
+        ];
 
         // Get recent activities
         $recentActivities = collect();
@@ -50,10 +46,11 @@ class DashboardController extends Controller
             ->map(function ($pengaduan) {
                 return (object)[
                     'type' => 'pengaduan',
-                    'description' => "Pengaduan baru dari {$pengaduan->user->nama_pengguna}",
+                    'description' => "Pengaduan baru dari " . $pengaduan->user->nama_pengguna,
                     'created_at' => $pengaduan->tgl_pengajuan
                 ];
             });
+        
         $recentActivities = $recentActivities->concat($recentPengaduan);
 
         // Get recent item approvals
@@ -64,10 +61,11 @@ class DashboardController extends Controller
             ->map(function ($item) {
                 return (object)[
                     'type' => 'approval',
-                    'description' => "Item {$item->nama_barang_baru} telah disetujui",
+                    'description' => "Item " . $item->nama_barang_baru . " telah disetujui",
                     'created_at' => $item->tanggal_persetujuan
                 ];
             });
+        
         $recentActivities = $recentActivities->concat($recentApprovals)
             ->sortByDesc('created_at')
             ->take(5);

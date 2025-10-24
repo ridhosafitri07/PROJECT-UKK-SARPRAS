@@ -12,6 +12,18 @@ class AuthController extends Controller
 {
     public function showLogin()
     {
+        // If user is already logged in, redirect to their dashboard
+        if (Auth::check()) {
+            $user = Auth::user();
+            switch ($user->role) {
+                case 'admin':
+                    return redirect()->route('admin.dashboard');
+                case 'petugas':
+                    return redirect()->route('petugas.dashboard');
+                case 'pengguna':
+                    return redirect()->route('pengguna.dashboard');
+            }
+        }
         return view('auth.login');
     }
 
@@ -29,19 +41,7 @@ class AuthController extends Controller
 
         if (Auth::attempt($credentials)) {
             $request->session()->regenerate();
-            
-            // Redirect based on role
-            $user = Auth::user();
-            switch ($user->role) {
-                case 'admin':
-                    return redirect()->intended('/admin/dashboard');
-                case 'petugas':
-                    return redirect()->intended('/petugas/dashboard');
-                case 'pengguna':
-                    return redirect()->intended('/pengguna/dashboard');
-                default:
-                    return redirect()->intended('/');
-            }
+            return redirect('/' . Auth::user()->role . '/dashboard');
         }
 
         return back()->withErrors([

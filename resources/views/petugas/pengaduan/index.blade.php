@@ -1,59 +1,39 @@
-@extends('layouts.admin')
+@extends('layouts.petugas')
 
-@section('title', 'Manajemen Pengaduan')
-@section('header', 'Manajemen Pengaduan')
-@section('subheader', 'Kelola dan pantau semua pengaduan')
+@section('title', 'Tugas Pengaduan')
+@section('header', 'Tugas Pengaduan')
+@section('subheader', 'Kelola dan tangani pengaduan yang masuk')
 
 @section('content')
 <!-- Statistics -->
-<div class="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+    <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-blue-100">Total Pengaduan</p>
+                <p class="text-sm font-medium text-blue-100">Total Tugas</p>
                 <p class="text-3xl font-bold mt-2">{{ $statistics['total'] }}</p>
             </div>
             <i class="fas fa-clipboard-list text-4xl text-blue-200"></i>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-yellow-100">Diajukan</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['diajukan'] }}</p>
+                <p class="text-sm font-medium text-yellow-100">Perlu Dikerjakan</p>
+                <p class="text-3xl font-bold mt-2">{{ $statistics['disetujui'] }}</p>
             </div>
-            <i class="fas fa-paper-plane text-4xl text-yellow-200"></i>
+            <i class="fas fa-exclamation-circle text-4xl text-yellow-200"></i>
         </div>
     </div>
     
-    <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
+    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105 transition-all">
         <div class="flex items-center justify-between">
             <div>
-                <p class="text-sm font-medium text-indigo-100">Diproses</p>
+                <p class="text-sm font-medium text-green-100">Sedang Diproses</p>
                 <p class="text-3xl font-bold mt-2">{{ $statistics['diproses'] }}</p>
             </div>
-            <i class="fas fa-cog text-4xl text-indigo-200"></i>
-        </div>
-    </div>
-    
-    <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-green-100">Selesai</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['selesai'] }}</p>
-            </div>
-            <i class="fas fa-check-circle text-4xl text-green-200"></i>
-        </div>
-    </div>
-    
-    <div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl shadow-lg p-6 text-white transform hover:scale-105">
-        <div class="flex items-center justify-between">
-            <div>
-                <p class="text-sm font-medium text-red-100">Ditolak</p>
-                <p class="text-3xl font-bold mt-2">{{ $statistics['ditolak'] }}</p>
-            </div>
-            <i class="fas fa-times-circle text-4xl text-red-200"></i>
+            <i class="fas fa-cog text-4xl text-green-200"></i>
         </div>
     </div>
 </div>
@@ -63,17 +43,13 @@
     <div class="p-6 border-b border-gray-200">
         <div class="flex items-center justify-between">
             <h3 class="text-lg font-bold text-gray-800 flex items-center">
-                <i class="fas fa-list text-blue-500 mr-2"></i>
-                Daftar Pengaduan
+                <i class="fas fa-list text-green-500 mr-2"></i>
+                Daftar Tugas Pengaduan
             </h3>
             <div class="flex space-x-2">
                 <button class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 flex items-center">
                     <i class="fas fa-filter mr-2"></i>
                     Filter
-                </button>
-                <button class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 flex items-center">
-                    <i class="fas fa-download mr-2"></i>
-                    Export
                 </button>
             </div>
         </div>
@@ -120,8 +96,8 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <div class="flex items-center">
-                            <div class="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center mr-3">
-                                <span class="text-blue-600 font-bold text-xs">{{ strtoupper(substr($item->user->nama_pengguna, 0, 2)) }}</span>
+                            <div class="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center mr-3">
+                                <span class="text-green-600 font-bold text-xs">{{ strtoupper(substr($item->user->nama_pengguna, 0, 2)) }}</span>
                             </div>
                             <div>
                                 <p class="text-sm font-medium text-gray-900">{{ $item->user->nama_pengguna }}</p>
@@ -139,18 +115,16 @@
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap">
                         <span class="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full
-                            @if($item->status === 'Diajukan') bg-yellow-100 text-yellow-800
-                            @elseif($item->status === 'Disetujui') bg-green-100 text-green-800
-                            @elseif($item->status === 'Ditolak') bg-red-100 text-red-800
-                            @elseif($item->status === 'Diproses') bg-blue-100 text-blue-800
+                            @if($item->status === 'Disetujui') bg-yellow-100 text-yellow-800
+                            @elseif($item->status === 'Diproses') bg-green-100 text-green-800
                             @else bg-gray-100 text-gray-800
                             @endif">
                             {{ $item->status }}
                         </span>
                     </td>
                     <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        <a href="{{ route('admin.pengaduan.show', $item) }}" 
-                           class="text-blue-600 hover:text-blue-900 inline-flex items-center">
+                        <a href="{{ route('petugas.pengaduan.show', $item) }}" 
+                           class="text-green-600 hover:text-green-900 inline-flex items-center">
                             <i class="fas fa-eye mr-1"></i>
                             Detail
                         </a>
@@ -160,8 +134,8 @@
                 <tr>
                     <td colspan="7" class="px-6 py-12 text-center">
                         <i class="fas fa-inbox text-gray-300 text-5xl mb-4"></i>
-                        <p class="text-gray-500 font-medium">Tidak ada pengaduan</p>
-                        <p class="text-gray-400 text-sm mt-2">Pengaduan akan muncul di sini</p>
+                        <p class="text-gray-500 font-medium">Tidak ada tugas pengaduan</p>
+                        <p class="text-gray-400 text-sm mt-2">Tugas akan muncul di sini</p>
                     </td>
                 </tr>
                 @endforelse

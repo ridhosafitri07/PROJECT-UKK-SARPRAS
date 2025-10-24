@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Dashboard') - SAPRAS</title>
+    <title>@yield('title', 'Dashboard') - SAPRAS Petugas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Custom scrollbar */
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -24,24 +22,22 @@
             background: #555;
         }
         
-        /* Smooth transitions */
         * {
             transition: all 0.3s ease;
         }
         
-        /* Sidebar active state */
         .sidebar-link.active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             color: white;
         }
         
         .sidebar-link:hover {
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(16, 185, 129, 0.1);
             transform: translateX(5px);
         }
         
         .sidebar-link.active:hover {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
             transform: translateX(5px);
         }
     </style>
@@ -49,16 +45,16 @@
 <body class="bg-gray-50">
     <div class="flex h-screen overflow-hidden">
         <!-- Sidebar -->
-        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-blue-600 to-blue-800 shadow-2xl z-50 flex flex-col">
+        <aside class="fixed left-0 top-0 h-full w-64 bg-gradient-to-br from-green-600 to-green-800 shadow-2xl z-50 flex flex-col">
             <!-- Logo Section -->
-            <div class="p-6 border-b border-blue-700">
+            <div class="p-6 border-b border-green-700">
                 <div class="flex items-center space-x-3">
                     <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-                        <i class="fas fa-tools text-blue-600 text-xl"></i>
+                        <i class="fas fa-wrench text-green-600 text-xl"></i>
                     </div>
                     <div>
                         <h1 class="text-white text-xl font-bold">SAPRAS</h1>
-                        <p class="text-blue-200 text-xs">Manajemen Sarpras</p>
+                        <p class="text-green-200 text-xs">Panel Petugas</p>
                     </div>
                 </div>
             </div>
@@ -66,49 +62,43 @@
             <!-- Menu Section -->
             <nav class="flex-1 overflow-y-auto py-6 px-3">
                 <div class="space-y-2">
-                    <a href="{{ route('admin.dashboard') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
+                    <a href="{{ route('petugas.dashboard') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('petugas.dashboard') ? 'active' : '' }}">
                         <i class="fas fa-home w-5"></i>
                         <span class="font-medium">Dashboard</span>
                     </a>
 
-                    <a href="{{ route('admin.pengaduan.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.pengaduan.*') ? 'active' : '' }}">
-                        <i class="fas fa-clipboard-list w-5"></i>
-                        <span class="font-medium">Pengaduan</span>
+                    <a href="{{ route('petugas.pengaduan.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('petugas.pengaduan.*') ? 'active' : '' }}">
+                        <i class="fas fa-tasks w-5"></i>
+                        <span class="font-medium">Tugas Pengaduan</span>
                     </a>
 
-                    <a href="{{ route('admin.sarpras.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.sarpras.*') ? 'active' : '' }}">
-                        <i class="fas fa-boxes w-5"></i>
-                        <span class="font-medium">Manajemen Sarpras</span>
-                    </a>
-
-                    <a href="{{ route('admin.users.index') }}" 
-                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        <i class="fas fa-users w-5"></i>
-                        <span class="font-medium">Users</span>
+                    <a href="{{ route('petugas.riwayat.index') }}" 
+                       class="sidebar-link flex items-center space-x-3 px-4 py-3 rounded-lg text-white {{ request()->routeIs('petugas.riwayat.*') ? 'active' : '' }}">
+                        <i class="fas fa-history w-5"></i>
+                        <span class="font-medium">Riwayat Pengaduan</span>
                     </a>
                 </div>
             </nav>
 
             <!-- User Profile Section -->
-            <div class="p-4 border-t border-blue-700">
+            <div class="p-4 border-t border-green-700">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center space-x-3">
-                        <div class="w-10 h-10 bg-blue-300 rounded-full flex items-center justify-center">
-                            <span class="text-blue-800 font-bold text-sm">
+                        <div class="w-10 h-10 bg-green-300 rounded-full flex items-center justify-center">
+                            <span class="text-green-800 font-bold text-sm">
                                 {{ strtoupper(substr(auth()->user()->nama_pengguna, 0, 2)) }}
                             </span>
                         </div>
                         <div class="text-white">
                             <p class="text-sm font-medium">{{ auth()->user()->nama_pengguna }}</p>
-                            <p class="text-xs text-blue-200">{{ ucfirst(auth()->user()->role) }}</p>
+                            <p class="text-xs text-green-200">Petugas</p>
                         </div>
                     </div>
                     <form action="{{ route('logout') }}" method="POST">
                         @csrf
-                        <button type="submit" class="text-blue-200 hover:text-white" title="Logout">
+                        <button type="submit" class="text-green-200 hover:text-white" title="Logout">
                             <i class="fas fa-sign-out-alt"></i>
                         </button>
                     </form>
@@ -172,7 +162,7 @@
             <footer class="bg-white border-t border-gray-200 py-4 px-8">
                 <div class="flex items-center justify-between text-sm text-gray-600">
                     <p>&copy; {{ date('Y') }} SAPRAS - Sistem Manajemen Sarana Prasarana</p>
-                    <p>Version 1.0.0</p>
+                    <p>Version 1.0.0 - Petugas Panel</p>
                 </div>
             </footer>
         </div>
